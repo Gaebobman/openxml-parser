@@ -1,0 +1,15 @@
+.venv/
+.pytest_cache/
+__pycache__/
+*.pyc
+.coverage
+htmlcov/
+.DS_Store
+# Local-only: sample outputs and proprietary test fixtures (never commit)
+example/*
+!example/README.md
+testdata/*
+!testdata/README.md
+
+out/
+*.egg-info/

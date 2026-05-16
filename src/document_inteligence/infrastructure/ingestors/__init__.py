@@ -1,0 +1,2 @@
+"""Ingestor adapters."""
+
