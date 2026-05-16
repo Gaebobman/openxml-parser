@@ -17,6 +17,19 @@
 
 ## 최신 반영 사항 (현재 구현)
 
+### 다포맷 인제스트 (Ingestion)
+
+| 포맷 | Ingestor | 레이아웃 |
+|------|----------|----------|
+| PPTX | `pptx_ingestor.py` | 슬라이드 좌표 (EMU → normalized bbox) |
+| DOCX | `docx_ingestor.py` | 구조 흐름 + optional drawing anchor bbox |
+| XLSX | `xlsx_ingestor.py` | 시트 = 페이지, 표 + 이미지/차트 앵커 |
+| HWPX | `hwpx_ingestor.py` | section XML, 구조 흐름 |
+
+- 등록: `infrastructure/ingestors/registry.py` → `build_ingestors()`
+- 공개 샘플: `public_samples/openxml_parser_public_sample.{pptx,docx,xlsx,hwpx}`
+- 이후 파이프라인(containment, reading order, relations, render)은 포맷 공통
+
 ### 추출/렌더링
 - 테이블 렌더링은 기본적으로 HTML `<table>`을 사용하며 병합 셀 span(`colspan`, `rowspan`)을 보존합니다. `<colgroup>`으로 PPTX 원본의 컬럼 너비 비율도 보존합니다.
 - **테이블 헤더 rowspan 안전성**: `<thead>` 첫 행에 `rowspan > 1`인 셀이 있으면 해당 범위의 행을 모두 `<thead>`에 포함시켜 `<thead>`/`<tbody>` 경계에서 rowspan이 끊기는 문제를 방지합니다.

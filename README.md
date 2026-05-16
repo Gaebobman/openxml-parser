@@ -20,9 +20,9 @@ Open XML 문서(PPTX, DOCX, XLSX, HWPX)를 **구조화 JSON · Markdown · RAG c
 | Format | Status | Notes |
 |--------|--------|--------|
 | `.pptx` | Full | Slide coordinates, master shapes, OMML math (linear) |
-| `.docx` | MVP | Structural flow; section ≈ page |
-| `.xlsx` | MVP | One sheet = one page; sheet as table |
-| `.hwpx` | MVP | Section XML; structural flow |
+| `.docx` | Beta | Sections, headings/lists, tables, inline images |
+| `.xlsx` | Beta | Sheet table + merged cells; embedded images/charts |
+| `.hwpx` | Beta | Section XML; tables with colspan |
 | `.hwp` (binary) | Not supported | Use HWPX export |
 
 ## Quick start
@@ -35,21 +35,17 @@ cd openxml-parser
 uv sync
 ```
 
-Parse the included public sample:
+Parse the included public samples (`public_samples/`):
 
 ```bash
+# PPTX (full layout pipeline)
 uv run doc-parser public_samples/openxml_parser_public_sample.pptx \
-  --output-md out/sample.md \
-  --output-json out/sample.json \
-  --assets-dir out/sample_assets
-```
+  --output-md out/sample.md --output-json out/sample.json --assets-dir out/sample_assets
 
-Other formats:
-
-```bash
-uv run doc-parser document.docx --output-md out/doc.md
-uv run doc-parser sheet.xlsx --output-json out/sheet.json
-uv run doc-parser document.hwpx --output-md out/doc.md
+# DOCX / XLSX / HWPX
+uv run doc-parser public_samples/openxml_parser_public_sample.docx --output-md out/doc.md
+uv run doc-parser public_samples/openxml_parser_public_sample.xlsx --output-json out/sheet.json
+uv run doc-parser public_samples/openxml_parser_public_sample.hwpx --output-md out/hwp.md
 ```
 
 ## CLI
@@ -142,8 +138,9 @@ Never put internal file names or customer content in README, docs, or commit mes
 ## Roadmap
 
 - VLM/CLIP `CaptionVerifier` and relation reranker adapters
-- DOCX/HWPX floating layout and richer table merge
-- XLSX charts and embedded images
+- DOCX numbering.xml integration and floating text boxes
+- XLSX cell-level elements (optional) and formula preservation
+- HWPX binary `.hwp` conversion path
 - OMML → LaTeX, equation OCR fallback
 
 See [`docs/README.md`](docs/README.md) for implementation notes and pseudocode.

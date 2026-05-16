@@ -1,10 +1,19 @@
 # Public samples
 
-Safe-to-share PPTX fixtures for demos, CI smoke tests, and documentation.
+Safe-to-share fixtures for demos, CI smoke tests, and documentation.
 
-| File | Description |
-|------|-------------|
-| `openxml_parser_public_sample.pptx` | Multi-slide demo covering common parser cases (layout, tables, images, relations). |
+| File | Format | Description |
+|------|--------|-------------|
+| `openxml_parser_public_sample.pptx` | PPTX | Multi-slide layout demo (tables, images, relations) |
+| `openxml_parser_public_sample.docx` | DOCX | Heading, list, table |
+| `openxml_parser_public_sample.xlsx` | XLSX | Merged cells, metrics table |
+| `openxml_parser_public_sample.hwpx` | HWPX | Paragraph + table with colspan |
+
+Regenerate minimal DOCX/XLSX/HWPX fixtures:
+
+```bash
+uv run python scripts/build_public_samples.py
+```
 
 ## Quick start
 
@@ -15,4 +24,12 @@ uv run doc-parser public_samples/openxml_parser_public_sample.pptx \
   --assets-dir out/public_sample_assets
 ```
 
-Proprietary or customer documents belong in `example/` (gitignored), not here.
+Other formats:
+
+```bash
+uv run doc-parser public_samples/openxml_parser_public_sample.docx --output-md out/doc.md
+uv run doc-parser public_samples/openxml_parser_public_sample.xlsx --output-json out/sheet.json
+uv run doc-parser public_samples/openxml_parser_public_sample.hwpx --output-md out/hwp.md
+```
+
+Proprietary documents belong in `example/` (gitignored), not here.

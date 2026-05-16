@@ -3,6 +3,7 @@ from __future__ import annotations
 from pathlib import Path
 
 from openpyxl import load_workbook
+
 from document_inteligence.domain.entities import (
     DocumentElement,
     DocumentPage,
@@ -10,10 +11,14 @@ from document_inteligence.domain.entities import (
     ParsedDocument,
 )
 from document_inteligence.domain.repositories import DocumentIngestor
-from document_inteligence.infrastructure.ingestors._ooxml_utils import synthetic_bbox
+from document_inteligence.domain.value_objects import BBox
+from document_inteligence.infrastructure.ingestors._ooxml_utils import clamp_01, synthetic_bbox
 
 
 class XlsxIngestor(DocumentIngestor):
+    def __init__(self, asset_output_dir: str | None = None) -> None:
+        self._asset_output_dir = Path(asset_output_dir) if asset_output_dir else None
+
     def supports(self, path: str) -> bool:
         return Path(path).suffix.lower() in {".xlsx", ".xlsm", ".xltx", ".xltm"}
 
@@ -23,7 +28,12 @@ class XlsxIngestor(DocumentIngestor):
 
         for page_idx, sheet_name in enumerate(wb.sheetnames, start=1):
             ws = wb[sheet_name]
-            elements = _sheet_to_elements(ws, page_number=page_idx, sheet_name=sheet_name)
+            elements = _sheet_to_elements(
+                ws,
+                page_number=page_idx,
+                sheet_name=sheet_name,
+                asset_output_dir=self._asset_output_dir,
+            )
             pages.append(
                 DocumentPage(
                     page_number=page_idx,
@@ -41,7 +51,13 @@ class XlsxIngestor(DocumentIngestor):
         return ParsedDocument(source_path=str(path), pages=pages)
 
 
-def _sheet_to_elements(ws, *, page_number: int, sheet_name: str) -> list[DocumentElement]:
+def _sheet_to_elements(
+    ws,
+    *,
+    page_number: int,
+    sheet_name: str,
+    asset_output_dir: Path | None,
+) -> list[DocumentElement]:
     if ws.max_row is None or ws.max_column is None:
         return []
 
@@ -102,7 +118,7 @@ def _sheet_to_elements(ws, *, page_number: int, sheet_name: str) -> list[Documen
     col_widths = [1.0 for _ in range(max_col)]
     row_heights = [1.0 for _ in range(max_row)]
 
-    return [
+    elements: list[DocumentElement] = [
         DocumentElement(
             element_id=f"E_{page_number:03d}_0001",
             element_type=ElementType.TABLE,
@@ -119,6 +135,113 @@ def _sheet_to_elements(ws, *, page_number: int, sheet_name: str) -> list[Documen
             },
         )
     ]
+
+    order = 2
+    for img_el in _extract_sheet_images(ws, page_number=page_number, asset_output_dir=asset_output_dir, start_order=order):
+        elements.append(img_el)
+        order += 1
+
+    for chart_el in _extract_sheet_charts(ws, page_number=page_number, max_row=max_row, max_col=max_col, start_order=order):
+        elements.append(chart_el)
+        order += 1
+
+    return elements
+
+
+def _extract_sheet_images(
+    ws,
+    *,
+    page_number: int,
+    asset_output_dir: Path | None,
+    start_order: int,
+) -> list[DocumentElement]:
+    images = getattr(ws, "_images", None) or []
+    out: list[DocumentElement] = []
+    order = start_order
+
+    for idx, image in enumerate(images):
+        anchor = getattr(image, "anchor", None)
+        bbox = _anchor_bbox(anchor, ws, fallback_index=order)
+        data = image._data()
+        if not data:
+            continue
+        ext = "png"
+        filename = f"sheet{page_number}_img{idx + 1}.{ext}"
+        rel_path = filename
+        if asset_output_dir is not None:
+            asset_output_dir.mkdir(parents=True, exist_ok=True)
+            out_path = asset_output_dir / filename
+            out_path.write_bytes(data() if callable(data) else data)
+            rel_path = f"{asset_output_dir.name}/{filename}"
+
+        out.append(
+            DocumentElement(
+                element_id=f"E_{page_number:03d}_{order:04d}",
+                element_type=ElementType.IMAGE,
+                page_number=page_number,
+                z_order=order,
+                bbox=bbox,
+                metadata={
+                    "source_format": "xlsx",
+                    "image": {
+                        "filename": filename,
+                        "relative_path": rel_path,
+                        "content_type": f"image/{ext}",
+                    },
+                },
+            )
+        )
+        order += 1
+    return out
+
+
+def _extract_sheet_charts(
+    ws,
+    *,
+    page_number: int,
+    max_row: int,
+    max_col: int,
+    start_order: int,
+) -> list[DocumentElement]:
+    charts = getattr(ws, "_charts", None) or []
+    out: list[DocumentElement] = []
+    order = start_order
+    for idx, chart in enumerate(charts):
+        anchor = getattr(chart, "anchor", None)
+        bbox = _anchor_bbox(anchor, ws, fallback_index=order)
+        title = getattr(chart, "title", None)
+        text = str(title) if title else f"Chart {idx + 1}"
+        out.append(
+            DocumentElement(
+                element_id=f"E_{page_number:03d}_{order:04d}",
+                element_type=ElementType.CHART,
+                page_number=page_number,
+                z_order=order,
+                bbox=bbox,
+                text=text,
+                metadata={"source_format": "xlsx", "chart_index": idx},
+            )
+        )
+        order += 1
+    return out
+
+
+def _anchor_bbox(anchor, ws, *, fallback_index: int) -> BBox:
+    if anchor is None or ws.max_column is None or ws.max_row is None:
+        return synthetic_bbox(fallback_index)
+
+    try:
+        col = anchor._from.col + 1
+        row = anchor._from.row + 1
+        max_col = max(ws.max_column, 1)
+        max_row = max(ws.max_row, 1)
+        x = clamp_01((col - 1) / max_col)
+        y = clamp_01((row - 1) / max_row)
+        w = clamp_01(1.0 / max_col)
+        h = clamp_01(1.0 / max_row)
+        return BBox(x=x, y=y, width=max(w, 0.05), height=max(h, 0.05))
+    except Exception:
+        return synthetic_bbox(fallback_index)
 
 
 def _cell_display(value: object) -> str:

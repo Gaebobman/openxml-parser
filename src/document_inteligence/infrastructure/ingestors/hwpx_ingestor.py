@@ -157,6 +157,17 @@ def _iter_blocks(root: ET.Element):
             yield from _iter_blocks(child)
 
 
+def _hwpx_span(tc: ET.Element, attr: str, *, default: int) -> int:
+    for key in (attr, attr.lower(), f"hp:{attr}"):
+        raw = tc.get(key)
+        if raw is not None:
+            try:
+                return max(int(raw), 1)
+            except ValueError:
+                return default
+    return default
+
+
 def _hwpx_paragraph_text(p: ET.Element) -> str:
     parts: list[str] = []
     for node in p.iter():
@@ -173,23 +184,42 @@ def _parse_hwpx_table(tbl: ET.Element) -> tuple[list[dict[str, object]], str | N
     cells_meta: list[dict[str, object]] = []
     matrix: list[list[str]] = []
 
+    occupied: set[tuple[int, int]] = set()
+    col_cursor = 0
+
     for r_idx, tr in enumerate(rows):
         row_cells = [el for el in tr if local_name(el.tag) == "tc"]
         row_text: list[str] = []
-        for c_idx, tc in enumerate(row_cells):
+        c_idx = 0
+        for tc in row_cells:
+            while (r_idx, c_idx) in occupied:
+                c_idx += 1
+            col_span = _hwpx_span(tc, "colSpan", default=1)
+            row_span = _hwpx_span(tc, "rowSpan", default=1)
             text = _hwpx_paragraph_text(tc) or text_content(tc)
-            row_text.append(text)
-            cells_meta.append(
-                {
-                    "row": r_idx,
-                    "col": c_idx,
-                    "text": text or None,
-                    "is_spanned": False,
-                    "span_width": 1,
-                    "span_height": 1,
-                    "is_merge_origin": True,
-                }
-            )
+            if c_idx < len(row_text):
+                row_text.extend([""] * (c_idx - len(row_text) + 1))
+            while len(row_text) <= c_idx:
+                row_text.append("")
+            row_text[c_idx] = text
+
+            for dr in range(row_span):
+                for dc in range(col_span):
+                    rr, cc = r_idx + dr, c_idx + dc
+                    is_origin = dr == 0 and dc == 0
+                    cells_meta.append(
+                        {
+                            "row": rr,
+                            "col": cc,
+                            "text": text if is_origin else None,
+                            "is_spanned": not is_origin,
+                            "span_width": col_span if is_origin else 1,
+                            "span_height": row_span if is_origin else 1,
+                            "is_merge_origin": is_origin,
+                        }
+                    )
+                    occupied.add((rr, cc))
+            c_idx += col_span
         matrix.append(row_text)
 
     lines = [" | ".join(row) for row in matrix if any(c.strip() for c in row)]

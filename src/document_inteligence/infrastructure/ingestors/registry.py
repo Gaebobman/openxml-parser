@@ -21,6 +21,6 @@ def build_ingestors(
             deduplicate_master_shapes=deduplicate_master_shapes,
         ),
         DocxIngestor(asset_output_dir=asset_output_dir),
-        XlsxIngestor(),
+        XlsxIngestor(asset_output_dir=asset_output_dir),
         HwpxIngestor(asset_output_dir=asset_output_dir),
     ]

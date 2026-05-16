@@ -108,6 +108,8 @@ def _render_element(element: DocumentElement, *, title_used: bool, config: Parse
 def _looks_like_title(element: DocumentElement, config: ParserConfig) -> bool:
     if bool(element.metadata.get("is_placeholder")):
         return True
+    if bool(element.metadata.get("is_heading")):
+        return True
     text = (element.text or "").strip()
     if not text:
         return False

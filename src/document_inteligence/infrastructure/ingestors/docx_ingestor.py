@@ -11,16 +11,23 @@ from document_inteligence.domain.entities import (
     ParsedDocument,
 )
 from document_inteligence.domain.repositories import DocumentIngestor
+from document_inteligence.domain.value_objects import BBox
 from document_inteligence.infrastructure.ingestors._ooxml_utils import (
     local_name,
     read_zip_xml,
     synthetic_bbox,
     text_content,
 )
+from document_inteligence.infrastructure.ingestors.docx_paragraph import paragraph_text_and_meta
 from document_inteligence.infrastructure.ingestors.docx_table_xml import parse_word_table
 
 W_NS = {"w": "http://schemas.openxmlformats.org/wordprocessingml/2006/main"}
 A_NS = {"a": "http://schemas.openxmlformats.org/drawingml/2006/main"}
+WP_NS = {
+    "wp": "http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing",
+    "a": A_NS["a"],
+}
+EMU_PER_PAGE_WIDTH = 6_000_000  # nominal page width EMU for anchor normalization
 R_NS = {
     "r": "http://schemas.openxmlformats.org/officeDocument/2006/relationships",
     "w": W_NS["w"],
@@ -134,7 +141,7 @@ def _blocks_to_elements(
         bbox = synthetic_bbox(order - 1)
 
         if tag == "p":
-            text = _paragraph_text(node)
+            text, para_meta = paragraph_text_and_meta(node)
             drawings = node.findall(".//w:drawing", W_NS)
             if text:
                 elements.append(
@@ -145,19 +152,20 @@ def _blocks_to_elements(
                         z_order=order,
                         bbox=bbox,
                         text=text,
-                        metadata={"source_format": "docx"},
+                        metadata=para_meta,
                     )
                 )
             for draw in drawings:
                 order += 1
+                draw_bbox = _drawing_bbox(draw, fallback_index=order - 1)
                 img = _extract_drawing_image(
                     draw,
                     zf=zf,
                     rels=rels,
-                    docx_path=docx_path,
                     page_number=page_number,
                     z_order=order,
                     asset_output_dir=asset_output_dir,
+                    bbox=draw_bbox,
                 )
                 if img:
                     elements.append(img)
@@ -201,19 +209,31 @@ def _blocks_to_elements(
     return elements
 
 
-def _paragraph_text(p: ET.Element) -> str:
-    parts: list[str] = []
-    for child in p:
-        local = child.tag.split("}")[-1]
-        if local == "r":
-            t = text_content(child, ns=W_NS)
-            if t:
-                parts.append(t)
-        elif local == "hyperlink":
-            t = text_content(child, ns=W_NS)
-            if t:
-                parts.append(t)
-    return "".join(parts).strip()
+def _drawing_bbox(drawing: ET.Element, *, fallback_index: int) -> BBox:
+    """Approximate bbox from wp:inline / wp:anchor extent and offsets."""
+
+    container = drawing.find(".//wp:inline", WP_NS) or drawing.find(".//wp:anchor", WP_NS)
+    if container is None:
+        return synthetic_bbox(fallback_index)
+
+    extent = container.find("wp:extent", WP_NS)
+    pos = container.find("wp:positionH/wp:posOffset", WP_NS)
+    pos_v = container.find("wp:positionV/wp:posOffset", WP_NS)
+    if extent is None:
+        return synthetic_bbox(fallback_index)
+
+    try:
+        cx = int(extent.get("cx", "0"))
+        cy = int(extent.get("cy", "0"))
+        left = int(pos.text) if pos is not None and pos.text else 0
+        top = int(pos_v.text) if pos_v is not None and pos_v.text else fallback_index * 500_000
+        width = max(cx / EMU_PER_PAGE_WIDTH, 0.05)
+        height = max(cy / EMU_PER_PAGE_WIDTH, 0.03)
+        x = max(0.0, min(left / EMU_PER_PAGE_WIDTH, 0.95))
+        y = max(0.0, min(top / EMU_PER_PAGE_WIDTH, 0.95))
+        return BBox(x=x, y=y, width=min(width, 1.0 - x), height=min(height, 1.0 - y))
+    except (TypeError, ValueError):
+        return synthetic_bbox(fallback_index)
 
 
 def _table_plain_text(parsed) -> str | None:
@@ -248,10 +268,10 @@ def _extract_drawing_image(
     *,
     zf: zipfile.ZipFile,
     rels: dict[str, str],
-    docx_path: Path,
     page_number: int,
     z_order: int,
     asset_output_dir: Path | None,
+    bbox: BBox,
 ) -> DocumentElement | None:
     blip = drawing.find(".//a:blip", A_NS)
     if blip is None:
@@ -283,7 +303,7 @@ def _extract_drawing_image(
         element_type=ElementType.IMAGE,
         page_number=page_number,
         z_order=z_order,
-        bbox=synthetic_bbox(z_order - 1),
+        bbox=bbox,
         text=None,
         metadata={
             "source_format": "docx",
