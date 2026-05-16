@@ -35,17 +35,17 @@ cd openxml-parser
 uv sync
 ```
 
-Parse the included public samples (`public_samples/`):
+Parse the included samples (`samples/`):
 
 ```bash
 # PPTX (full layout pipeline)
-uv run openxml-parser public_samples/openxml_parser_public_sample.pptx \
+uv run openxml-parser samples/openxml_parser_public_sample.pptx \
   --output-md out/sample.md --output-json out/sample.json --assets-dir out/sample_assets
 
 # DOCX / XLSX / HWPX
-uv run openxml-parser public_samples/openxml_parser_public_sample.docx --output-md out/doc.md
-uv run openxml-parser public_samples/openxml_parser_public_sample.xlsx --output-json out/sheet.json
-uv run openxml-parser public_samples/openxml_parser_public_sample.hwpx --output-md out/hwp.md
+uv run openxml-parser samples/openxml_parser_public_sample.docx --output-md out/doc.md
+uv run openxml-parser samples/openxml_parser_public_sample.xlsx --output-json out/sheet.json
+uv run openxml-parser samples/openxml_parser_public_sample.hwpx --output-md out/hwp.md
 ```
 
 ## CLI
@@ -60,7 +60,7 @@ openxml-parser INPUT [--output-json PATH] [--output-md PATH]
 Example with all outputs:
 
 ```bash
-uv run openxml-parser public_samples/openxml_parser_public_sample.pptx \
+uv run openxml-parser samples/openxml_parser_public_sample.pptx \
   --output-json out/result.json \
   --output-md out/result.md \
   --output-rag-json out/rag.json \
@@ -98,9 +98,9 @@ src/openxml_parser/
     strategies/     reading order implementations
     scorers/        rule_based_scorer
   interfaces/       cli.py
-public_samples/     shareable demo PPTX (committed)
-example/            local-only fixtures (gitignored)
-testdata/           local golden / samples (gitignored)
+samples/            shareable demo files (committed)
+private_example/    local-only fixtures (gitignored)
+private_testdata/   local golden / samples (gitignored)
 tests/
 docs/
 scripts/            evaluate_golden.py, evaluate_caption_baseline.py
@@ -119,7 +119,7 @@ Optional integration tests (local PPTX tree required):
 RUN_REAL_PPTX_TESTS=1 uv run pytest -q tests/test_real_pptx_dataset.py
 ```
 
-Golden-label regression (local `testdata/golden/*.golden.json` only):
+Golden-label regression (local `private_testdata/golden/*.golden.json` only):
 
 ```bash
 uv run python scripts/evaluate_golden.py --output-json out/eval/golden_report.json
@@ -130,8 +130,8 @@ uv run pytest tests/test_golden_regression.py -v
 
 Do **not** commit proprietary documents. Use:
 
-- `public_samples/` — safe demos for docs and CI smoke tests
-- `example/`, `testdata/` — gitignored; for internal fixtures and golden labels
+- `samples/` — safe demos for docs and CI smoke tests
+- `private_example/`, `private_testdata/` — gitignored; for internal fixtures and golden labels
 
 Never put internal file names or customer content in README, docs, or commit messages.
 

@@ -51,6 +51,11 @@ def paragraph_text_and_meta(p: ET.Element) -> tuple[str, dict[str, object]]:
                 parts.append(t)
 
     body = "".join(parts).strip()
+    if body and not meta.get("is_list_item") and not meta.get("is_heading"):
+        if len(body) <= 40 and len(body.split()) <= 6 and not body.endswith((".", ",", ";", ":", "•")):
+            meta["is_heading"] = True
+            meta["heading_level"] = 2
+
     if meta.get("is_list_item") and body:
         indent = "  " * int(meta.get("list_level", 0))
         body = f"{indent}- {body}"
@@ -62,6 +67,11 @@ def _run_text(run: ET.Element) -> str:
     """Text from run children only (exclude nested drawings/text boxes)."""
     parts: list[str] = []
     for node in run:
-        if local_name(node.tag) == "t" and node.text:
+        ln = local_name(node.tag)
+        if ln == "t" and node.text:
             parts.append(node.text)
+        elif ln == "tab":
+            parts.append("\t")
+        elif ln == "br":
+            parts.append("\n")
     return "".join(parts).strip()

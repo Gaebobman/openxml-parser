@@ -15,7 +15,7 @@ from openxml_parser.application.use_cases import ParseDocumentUseCase
 from openxml_parser.infrastructure.ingestors.pptx_ingestor import PptxIngestor
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
-GOLDEN_DIR = PROJECT_ROOT / "testdata" / "golden"
+GOLDEN_DIR = PROJECT_ROOT / "private_testdata" / "golden"
 
 # Thresholds - raise these as the parser improves
 MIN_KENDALL_TAU = 0.6

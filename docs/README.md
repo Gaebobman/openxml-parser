@@ -27,7 +27,7 @@
 | HWPX | `hwpx_ingestor.py` | section XML, 구조 흐름 |
 
 - 등록: `infrastructure/ingestors/registry.py` → `build_ingestors()`
-- 공개 샘플: `public_samples/openxml_parser_public_sample.{pptx,docx,xlsx,hwpx}`
+- 공개 샘플: `samples/openxml_parser_public_sample.{pptx,docx,xlsx,hwpx}` 및 `openxml_parser_public_sample_resume.docx`
 - 이후 파이프라인(containment, reading order, relations, render)은 포맷 공통
 
 ### 추출/렌더링
@@ -58,7 +58,7 @@
 - 충돌 해소 고도화: confidence 내림차순 greedy global assignment.
 
 ### 정량 평가 (Phase 1 신규)
-- **Golden label 스키마**: 로컬 `testdata/golden/*.golden.json` (git 미포함).
+- **Golden label 스키마**: 로컬 `private_testdata/golden/*.golden.json` (git 미포함).
 - **`evaluate_golden.py`**: Kendall's Tau, NED, P/R/F1 자동 평가.
 - **`test_golden_regression.py`**: 회귀 방지 자동 테스트.
 
@@ -77,5 +77,5 @@
 - **`xy_cut_gap_ratio` 기본값 0.006**: PPTX의 촘촘한 칼럼 간격(0.8%)도 감지할 수 있도록 임계치를 낮춤.
 
 ### 기타
-- 공개 데모: `public_samples/`. 로컬 전용 자료: `example/`, `testdata/` (gitignore).
+- 공개 데모: `samples/`. 로컬 전용 자료: `private_example/`, `private_testdata/` (gitignore).
 

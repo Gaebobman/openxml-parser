@@ -8,7 +8,7 @@ from pathlib import Path
 from openpyxl import Workbook
 
 ROOT = Path(__file__).resolve().parent.parent
-OUT = ROOT / "public_samples"
+OUT = ROOT / "samples"
 
 W_NS = "http://schemas.openxmlformats.org/wordprocessingml/2006/main"
 CT_NS = "http://schemas.openxmlformats.org/package/2006/content-types"

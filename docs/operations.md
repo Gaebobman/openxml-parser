@@ -76,7 +76,7 @@ uv run openxml-parser ./sample.pptx --reading-order composite --output-md ./out/
 
 ## 8. 회귀 점검 시나리오 (권장)
 
-1. `public_samples/openxml_parser_public_sample.pptx` 재파싱
+1. `samples/openxml_parser_public_sample.pptx` 재파싱
 2. 출력 Markdown에서 이미지 링크(상대경로) 존재 확인
 3. `--assets-dir` 추출 이미지가 슬라이드 표시와 일치하는지 확인 (crop 포함)
 4. `--output-debug-json`에서 `caption_candidate_decisions` 필드 존재 확인

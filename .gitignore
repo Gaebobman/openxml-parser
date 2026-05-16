@@ -5,11 +5,11 @@ __pycache__/
 .coverage
 htmlcov/
 .DS_Store
-# Local-only: sample outputs and proprietary test fixtures (never commit)
-example/*
-!example/README.md
-testdata/*
-!testdata/README.md
+# Local-only: proprietary fixtures and golden labels (never commit)
+private_example/*
+!private_example/README.md
+private_testdata/*
+!private_testdata/README.md
 
 out/
 *.egg-info/

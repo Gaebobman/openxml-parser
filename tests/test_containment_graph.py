@@ -61,6 +61,29 @@ def test_shape_as_bbox_groups_children() -> None:
     assert isinstance(absorbed, list) and len(absorbed) == 3
 
 
+def test_flow_layout_paragraphs_are_not_merged() -> None:
+    outer = _el(
+        "OUTER",
+        element_type=ElementType.TEXT,
+        bbox=BBox(x=0.1, y=0.1, width=0.8, height=0.5),
+        text="첫 문단",
+        metadata={"layout": "flow"},
+    )
+    inner = _el(
+        "INNER",
+        element_type=ElementType.TEXT,
+        bbox=BBox(x=0.1, y=0.15, width=0.8, height=0.05),
+        text="둘째 문단",
+        metadata={"layout": "flow"},
+    )
+    page = DocumentPage(page_number=1, width=1.0, height=1.0, elements=[outer, inner])
+
+    resolve_containment(page, ParserConfig(containment_threshold=0.5))
+
+    assert "absorbed_by" not in inner.metadata
+    assert "absorbed_by" not in outer.metadata
+
+
 def test_non_overlapping_elements_remain_independent() -> None:
     e1 = _el("A", element_type=ElementType.TEXT,
              bbox=BBox(x=0.0, y=0.0, width=0.3, height=0.3), text="왼쪽")

@@ -10,7 +10,7 @@ from openxml_parser.domain.entities import ElementType
 from openxml_parser.infrastructure.ingestors.pptx_ingestor import PptxIngestor
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
-DEFAULT_SAMPLE = PROJECT_ROOT / "testdata/pptx_samples/sample.pptx"
+DEFAULT_SAMPLE = PROJECT_ROOT / "private_testdata/pptx_samples/sample.pptx"
 
 
 @pytest.mark.skipif(os.getenv("RUN_REAL_PPTX_TESTS") != "1", reason="Set RUN_REAL_PPTX_TESTS=1 to run")

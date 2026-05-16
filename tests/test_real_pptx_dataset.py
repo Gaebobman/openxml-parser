@@ -10,7 +10,7 @@ from openxml_parser.infrastructure.ingestors.pptx_ingestor import PptxIngestor
 
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
-DATASET_ROOT = Path(os.getenv("REAL_PPTX_DATASET_ROOT", str(PROJECT_ROOT / "testdata/pptx_samples")))
+DATASET_ROOT = Path(os.getenv("REAL_PPTX_DATASET_ROOT", str(PROJECT_ROOT / "private_testdata/pptx_samples")))
 
 
 def _is_valid_pptx(path: Path) -> bool:

@@ -25,7 +25,7 @@
 
 - **Group Image Recall**
   - 그룹 내부 이미지가 Markdown에 누락되지 않는지 확인
-  - 예시: `public_samples/openxml_parser_public_sample.pptx` 또는 로컬 golden 데이터
+  - 예시: `samples/openxml_parser_public_sample.pptx` 또는 로컬 golden 데이터
 - **Caption Decision Trace Coverage**
   - `debug.json`의 `caption_candidate_decisions`가 페이지별로 채워지는지 확인
 - **Path Portability**

@@ -67,13 +67,17 @@ def _render_element(element: DocumentElement, *, title_used: bool, config: Parse
         text = (element.text or "").strip()
         if not text:
             return ""
-        display = text
+        display = text.replace("\t", " · ")
         if config.preserve_text_formatting:
             fmt = element.metadata.get("formatted_text")
             if isinstance(fmt, str) and fmt.strip():
                 display = fmt.strip()
         if not title_used and _looks_like_title(element, config):
             return f"# {text}"
+        if bool(element.metadata.get("is_heading")):
+            level = int(element.metadata.get("heading_level", 2) or 2)
+            level = max(2, min(level, 6))
+            return f"{'#' * level} {display}"
         return _preserve_linebreaks(display)
 
     if element.element_type == ElementType.IMAGE:

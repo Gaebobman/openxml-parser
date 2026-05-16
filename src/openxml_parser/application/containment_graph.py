@@ -39,6 +39,9 @@ def _build_parent_map(
                 continue
             if bool(child.metadata.get("absorbed_by")):
                 continue
+            # DOCX flow paragraphs use full-width bboxes; spatial merge drops content.
+            if child.metadata.get("layout") == "flow":
+                continue
 
             ratio = bbox_containment_ratio(
                 inner=child.bbox.__dict__,
