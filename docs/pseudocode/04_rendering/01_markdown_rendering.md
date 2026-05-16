@@ -1,6 +1,6 @@
 # Markdown Rendering
 
-> 코드: `src/document_inteligence/application/markdown_renderer.py`
+> 코드: `src/openxml_parser/application/markdown_renderer.py`
 
 ## 목적
 

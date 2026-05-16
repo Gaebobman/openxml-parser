@@ -14,14 +14,14 @@ import json
 from dataclasses import asdict
 from pathlib import Path
 
-from document_inteligence.application.config import ParserConfig
-from document_inteligence.application.evaluation import (
+from openxml_parser.application.config import ParserConfig
+from openxml_parser.application.evaluation import (
     kendall_tau,
     normalised_edit_distance,
     relation_prf,
 )
-from document_inteligence.application.use_cases import ParseDocumentUseCase
-from document_inteligence.infrastructure.ingestors.pptx_ingestor import PptxIngestor
+from openxml_parser.application.use_cases import ParseDocumentUseCase
+from openxml_parser.infrastructure.ingestors.pptx_ingestor import PptxIngestor
 
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent

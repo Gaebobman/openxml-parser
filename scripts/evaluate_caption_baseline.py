@@ -5,11 +5,11 @@ import json
 from dataclasses import asdict
 from pathlib import Path
 
-from document_inteligence.application.config import ParserConfig
-from document_inteligence.application.use_cases import ParseDocumentUseCase
-from document_inteligence.domain.entities import ElementType
-from document_inteligence.infrastructure.ingestors.pptx_ingestor import PptxIngestor
-from document_inteligence.infrastructure.verifiers.noop_caption_verifier import NoopCaptionVerifier
+from openxml_parser.application.config import ParserConfig
+from openxml_parser.application.use_cases import ParseDocumentUseCase
+from openxml_parser.domain.entities import ElementType
+from openxml_parser.infrastructure.ingestors.pptx_ingestor import PptxIngestor
+from openxml_parser.infrastructure.verifiers.noop_caption_verifier import NoopCaptionVerifier
 
 
 def _default_samples() -> list[str]:

@@ -1,10 +1,10 @@
 """Tests for title_of spatial scoping."""
 from __future__ import annotations
 
-from document_inteligence.application.config import ParserConfig
-from document_inteligence.application.relationships import _is_title_target
-from document_inteligence.domain.entities import DocumentElement, ElementType
-from document_inteligence.domain.value_objects import BBox
+from openxml_parser.application.config import ParserConfig
+from openxml_parser.application.relationships import _is_title_target
+from openxml_parser.domain.entities import DocumentElement, ElementType
+from openxml_parser.domain.value_objects import BBox
 
 
 def _elem(eid: str, bbox: BBox) -> DocumentElement:

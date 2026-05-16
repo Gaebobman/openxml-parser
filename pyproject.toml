@@ -1,5 +1,5 @@
 [project]
-name = "document-inteligence"
+name = "openxml-parser"
 version = "0.1.0"
 description = "Open XML document parser for LLM-friendly markdown and RAG chunks"
 readme = "README.md"
@@ -22,7 +22,7 @@ dependencies = [
 ]
 
 [project.scripts]
-doc-parser = "document_inteligence.interfaces.cli:main"
+openxml-parser = "openxml_parser.interfaces.cli:main"
 
 [dependency-groups]
 dev = [

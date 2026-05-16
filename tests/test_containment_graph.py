@@ -1,9 +1,9 @@
 from __future__ import annotations
 
-from document_inteligence.application.config import ParserConfig
-from document_inteligence.application.containment_graph import resolve_containment
-from document_inteligence.domain.entities import DocumentElement, DocumentPage, ElementType
-from document_inteligence.domain.value_objects import BBox
+from openxml_parser.application.config import ParserConfig
+from openxml_parser.application.containment_graph import resolve_containment
+from openxml_parser.domain.entities import DocumentElement, DocumentPage, ElementType
+from openxml_parser.domain.value_objects import BBox
 
 
 def _el(

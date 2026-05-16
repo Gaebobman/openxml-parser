@@ -5,20 +5,20 @@ before/after ordering, and column-break markers.
 """
 from __future__ import annotations
 
-from document_inteligence.application.config import ParserConfig
-from document_inteligence.application.markdown_renderer import (
+from openxml_parser.application.config import ParserConfig
+from openxml_parser.application.markdown_renderer import (
     _col_width_percentages,
     _group_separator,
     _infer_header_rows,
     render_markdown,
 )
-from document_inteligence.domain.entities import (
+from openxml_parser.domain.entities import (
     DocumentElement,
     DocumentPage,
     ElementType,
     ParsedDocument,
 )
-from document_inteligence.domain.value_objects import BBox
+from openxml_parser.domain.value_objects import BBox
 
 
 def _el(

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import xml.etree.ElementTree as ET
 
-from document_inteligence.infrastructure.ingestors.docx_layout import (
+from openxml_parser.infrastructure.ingestors.docx_layout import (
     LayoutCursor,
     drawing_bbox,
     paragraph_flow_bbox,

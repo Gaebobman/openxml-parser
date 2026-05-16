@@ -39,19 +39,19 @@ Parse the included public samples (`public_samples/`):
 
 ```bash
 # PPTX (full layout pipeline)
-uv run doc-parser public_samples/openxml_parser_public_sample.pptx \
+uv run openxml-parser public_samples/openxml_parser_public_sample.pptx \
   --output-md out/sample.md --output-json out/sample.json --assets-dir out/sample_assets
 
 # DOCX / XLSX / HWPX
-uv run doc-parser public_samples/openxml_parser_public_sample.docx --output-md out/doc.md
-uv run doc-parser public_samples/openxml_parser_public_sample.xlsx --output-json out/sheet.json
-uv run doc-parser public_samples/openxml_parser_public_sample.hwpx --output-md out/hwp.md
+uv run openxml-parser public_samples/openxml_parser_public_sample.docx --output-md out/doc.md
+uv run openxml-parser public_samples/openxml_parser_public_sample.xlsx --output-json out/sheet.json
+uv run openxml-parser public_samples/openxml_parser_public_sample.hwpx --output-md out/hwp.md
 ```
 
 ## CLI
 
 ```text
-doc-parser INPUT [--output-json PATH] [--output-md PATH]
+openxml-parser INPUT [--output-json PATH] [--output-md PATH]
                [--output-rag-json PATH] [--output-debug-json PATH]
                [--assets-dir DIR] [--config-json PATH]
                [--reading-order composite|row_clustering|xy_cut]
@@ -60,7 +60,7 @@ doc-parser INPUT [--output-json PATH] [--output-md PATH]
 Example with all outputs:
 
 ```bash
-uv run doc-parser public_samples/openxml_parser_public_sample.pptx \
+uv run openxml-parser public_samples/openxml_parser_public_sample.pptx \
   --output-json out/result.json \
   --output-md out/result.md \
   --output-rag-json out/rag.json \
@@ -69,7 +69,7 @@ uv run doc-parser public_samples/openxml_parser_public_sample.pptx \
   --reading-order composite
 ```
 
-Optional config JSON — see [ParserConfig](src/document_inteligence/application/config.py) fields.
+Optional config JSON — see [ParserConfig](src/openxml_parser/application/config.py) fields.
 
 ## Architecture
 
@@ -90,7 +90,7 @@ Details: [`docs/README.md`](docs/README.md), [`docs/architecture_diagrams.md`](d
 ## Project layout
 
 ```text
-src/document_inteligence/
+src/openxml_parser/
   domain/           entities, repositories, value_objects
   application/      use_cases, config, reading_order, relationships, renderers
   infrastructure/

@@ -5,8 +5,8 @@
 ```mermaid
 flowchart LR
     User[DeveloperOrOperator]
-    CLI[doc-parser CLI]
-    Parser[doc-xml-parser]
+    CLI[openxml-parser CLI]
+    Parser[openxml-parser]
     Files[(PPTX and Assets)]
     Outputs[(JSON Markdown RAG Debug)]
 

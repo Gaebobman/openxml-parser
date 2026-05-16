@@ -10,7 +10,7 @@ uv sync --group dev
 ## 2. 기본 파싱 실행
 
 ```bash
-uv run doc-parser ./sample.pptx \
+uv run openxml-parser ./sample.pptx \
   --output-json ./out/result.json \
   --output-md ./out/result.md \
   --output-rag-json ./out/rag.json \
@@ -53,9 +53,9 @@ uv run python scripts/evaluate_caption_baseline.py \
 ## 6. Reading Order 전략 변경
 
 ```bash
-uv run doc-parser ./sample.pptx --reading-order xy_cut --output-md ./out/result.md
-uv run doc-parser ./sample.pptx --reading-order row_clustering --output-md ./out/result.md
-uv run doc-parser ./sample.pptx --reading-order composite --output-md ./out/result.md
+uv run openxml-parser ./sample.pptx --reading-order xy_cut --output-md ./out/result.md
+uv run openxml-parser ./sample.pptx --reading-order row_clustering --output-md ./out/result.md
+uv run openxml-parser ./sample.pptx --reading-order composite --output-md ./out/result.md
 ```
 
 ## 7. 운영 체크포인트

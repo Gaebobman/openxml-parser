@@ -1,6 +1,6 @@
 # RAG Chunk Building
 
-> 코드: `src/document_inteligence/application/rag_pack.py`
+> 코드: `src/openxml_parser/application/rag_pack.py`
 
 ## 목적
 

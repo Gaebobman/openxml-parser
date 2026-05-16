@@ -1,9 +1,9 @@
 # Reading Order 전략
 
 > 코드:
-> - Domain port: `src/document_inteligence/domain/repositories.py` → `ReadingOrderStrategy`
-> - Application: `src/document_inteligence/application/reading_order.py`
-> - Strategies: `src/document_inteligence/infrastructure/strategies/`
+> - Domain port: `src/openxml_parser/domain/repositories.py` → `ReadingOrderStrategy`
+> - Application: `src/openxml_parser/application/reading_order.py`
+> - Strategies: `src/openxml_parser/infrastructure/strategies/`
 
 ## 아키텍처
 

@@ -4,8 +4,8 @@ from pathlib import Path
 
 import pytest
 
-from document_inteligence.application.use_cases import ParseDocumentUseCase
-from document_inteligence.infrastructure.ingestors.registry import build_ingestors
+from openxml_parser.application.use_cases import ParseDocumentUseCase
+from openxml_parser.infrastructure.ingestors.registry import build_ingestors
 
 ROOT = Path(__file__).resolve().parent.parent
 PUBLIC = ROOT / "public_samples"

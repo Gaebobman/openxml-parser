@@ -1,16 +1,16 @@
 from __future__ import annotations
 
-from document_inteligence.application.config import ParserConfig
-from document_inteligence.application.debug_report import build_debug_report
-from document_inteligence.application.rag_pack import build_rag_chunks
-from document_inteligence.domain.entities import (
+from openxml_parser.application.config import ParserConfig
+from openxml_parser.application.debug_report import build_debug_report
+from openxml_parser.application.rag_pack import build_rag_chunks
+from openxml_parser.domain.entities import (
     DocumentElement,
     DocumentPage,
     ElementRelation,
     ElementType,
     ParsedDocument,
 )
-from document_inteligence.domain.value_objects import BBox
+from openxml_parser.domain.value_objects import BBox
 
 
 def _text_element(element_id: str, text: str) -> DocumentElement:

@@ -3,13 +3,13 @@ from __future__ import annotations
 
 import pytest
 
-from document_inteligence.application.config import ParserConfig
-from document_inteligence.application.image_annotation_absorber import absorb_image_annotations
-from document_inteligence.domain.entities import DocumentElement, DocumentPage, ElementType
-from document_inteligence.domain.value_objects import BBox
+from openxml_parser.application.config import ParserConfig
+from openxml_parser.application.image_annotation_absorber import absorb_image_annotations
+from openxml_parser.domain.entities import DocumentElement, DocumentPage, ElementType
+from openxml_parser.domain.value_objects import BBox
 
 # Re-use the private helper via import of the module under test.
-from document_inteligence.application.use_cases import _is_noise
+from openxml_parser.application.use_cases import _is_noise
 
 
 def _elem(eid: str, etype: ElementType, bbox: BBox, text: str | None = None, **meta) -> DocumentElement:

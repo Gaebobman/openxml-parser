@@ -5,8 +5,8 @@ from pathlib import Path
 
 import pytest
 
-from document_inteligence.application.use_cases import ParseDocumentUseCase
-from document_inteligence.infrastructure.ingestors.pptx_ingestor import PptxIngestor
+from openxml_parser.application.use_cases import ParseDocumentUseCase
+from openxml_parser.infrastructure.ingestors.pptx_ingestor import PptxIngestor
 
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent

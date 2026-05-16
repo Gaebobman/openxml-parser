@@ -19,7 +19,7 @@ uv run python scripts/build_public_samples.py
 ## Quick start
 
 ```bash
-uv run doc-parser public_samples/openxml_parser_public_sample.pptx \
+uv run openxml-parser public_samples/openxml_parser_public_sample.pptx \
   --output-md out/public_sample.md \
   --output-json out/public_sample.json \
   --assets-dir out/public_sample_assets
@@ -28,9 +28,9 @@ uv run doc-parser public_samples/openxml_parser_public_sample.pptx \
 Other formats:
 
 ```bash
-uv run doc-parser public_samples/openxml_parser_public_sample.docx --output-md out/doc.md
-uv run doc-parser public_samples/openxml_parser_public_sample.xlsx --output-json out/sheet.json
-uv run doc-parser public_samples/openxml_parser_public_sample.hwpx --output-md out/hwp.md
+uv run openxml-parser public_samples/openxml_parser_public_sample.docx --output-md out/doc.md
+uv run openxml-parser public_samples/openxml_parser_public_sample.xlsx --output-json out/sheet.json
+uv run openxml-parser public_samples/openxml_parser_public_sample.hwpx --output-md out/hwp.md
 ```
 
 Proprietary documents belong in `example/` (gitignored), not here.

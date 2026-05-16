@@ -1,10 +1,10 @@
 # Relation Inference 개요
 
 > 코드:
-> - Domain ports: `src/document_inteligence/domain/repositories.py` → `RelationScorer`, `RelationReranker`, `CaptionVerifier`
-> - Application: `src/document_inteligence/application/relationships.py`
-> - Scorer: `src/document_inteligence/infrastructure/scorers/rule_based_scorer.py`
-> - Reranker: `src/document_inteligence/infrastructure/rerankers/noop_reranker.py`
+> - Domain ports: `src/openxml_parser/domain/repositories.py` → `RelationScorer`, `RelationReranker`, `CaptionVerifier`
+> - Application: `src/openxml_parser/application/relationships.py`
+> - Scorer: `src/openxml_parser/infrastructure/scorers/rule_based_scorer.py`
+> - Reranker: `src/openxml_parser/infrastructure/rerankers/noop_reranker.py`
 
 ## 아키텍처
 

@@ -7,11 +7,11 @@ from pathlib import Path
 import pytest
 from openpyxl import Workbook
 
-from document_inteligence.domain.entities import ElementType
-from document_inteligence.infrastructure.ingestors.docx_ingestor import DocxIngestor
-from document_inteligence.infrastructure.ingestors.hwpx_ingestor import HwpxIngestor
-from document_inteligence.infrastructure.ingestors.registry import build_ingestors
-from document_inteligence.infrastructure.ingestors.xlsx_ingestor import XlsxIngestor
+from openxml_parser.domain.entities import ElementType
+from openxml_parser.infrastructure.ingestors.docx_ingestor import DocxIngestor
+from openxml_parser.infrastructure.ingestors.hwpx_ingestor import HwpxIngestor
+from openxml_parser.infrastructure.ingestors.registry import build_ingestors
+from openxml_parser.infrastructure.ingestors.xlsx_ingestor import XlsxIngestor
 
 
 W_NS = "http://schemas.openxmlformats.org/wordprocessingml/2006/main"

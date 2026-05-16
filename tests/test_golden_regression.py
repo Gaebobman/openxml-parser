@@ -10,9 +10,9 @@ from pathlib import Path
 
 import pytest
 
-from document_inteligence.application.config import ParserConfig
-from document_inteligence.application.use_cases import ParseDocumentUseCase
-from document_inteligence.infrastructure.ingestors.pptx_ingestor import PptxIngestor
+from openxml_parser.application.config import ParserConfig
+from openxml_parser.application.use_cases import ParseDocumentUseCase
+from openxml_parser.infrastructure.ingestors.pptx_ingestor import PptxIngestor
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 GOLDEN_DIR = PROJECT_ROOT / "testdata" / "golden"
@@ -23,7 +23,7 @@ MIN_RELATION_F1 = 0.3
 MIN_NORMALISED_EDIT_DISTANCE = 0.4
 
 # Re-use metric functions from the evaluate script
-from document_inteligence.application.evaluation import (
+from openxml_parser.application.evaluation import (
     kendall_tau,
     normalised_edit_distance,
     relation_prf,

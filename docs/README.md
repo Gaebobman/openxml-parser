@@ -1,6 +1,6 @@
 # Documentation Index
 
-이 디렉토리는 `doc-xml-parser`의 운영/설계 문서를 관리합니다.
+이 디렉토리는 `openxml-parser`의 운영/설계 문서를 관리합니다.
 
 ## 문서 목록
 

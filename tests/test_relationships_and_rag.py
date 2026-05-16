@@ -1,11 +1,11 @@
 from __future__ import annotations
 
-from document_inteligence.application.config import ParserConfig
-from document_inteligence.application.rag_pack import build_rag_chunks
-from document_inteligence.application.relationships import detect_relations
-from document_inteligence.domain.entities import DocumentElement, DocumentPage, ElementType, ParsedDocument
-from document_inteligence.domain.repositories import CaptionVerifier
-from document_inteligence.domain.value_objects import BBox
+from openxml_parser.application.config import ParserConfig
+from openxml_parser.application.rag_pack import build_rag_chunks
+from openxml_parser.application.relationships import detect_relations
+from openxml_parser.domain.entities import DocumentElement, DocumentPage, ElementType, ParsedDocument
+from openxml_parser.domain.repositories import CaptionVerifier
+from openxml_parser.domain.value_objects import BBox
 
 
 def _el(element_id: str, t: ElementType, x: float, y: float, w: float, h: float, text: str | None = None):

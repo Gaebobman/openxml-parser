@@ -1,4 +1,4 @@
-# doc-xml-parser — 수도코드 문서
+# openxml-parser — 수도코드 문서
 
 핵심 알고리즘을 구현 코드와 대응해 이해하기 쉽게 정리한 문서 모음입니다.
 
@@ -56,12 +56,12 @@ docs/pseudocode/
 
 ## 코드 매핑
 
-- Ingestion: `src/document_inteligence/infrastructure/ingestors/pptx_ingestor.py`
-- Table XML: `src/document_inteligence/infrastructure/ingestors/pptx_table_xml.py`
-- Containment Graph: `src/document_inteligence/application/containment_graph.py`
-- Table Absorber: `src/document_inteligence/application/table_absorber.py`
-- Reading Order: `src/document_inteligence/application/reading_order.py`
-- Relation Inference: `src/document_inteligence/application/relationships.py`
-- Markdown: `src/document_inteligence/application/markdown_renderer.py`
-- RAG: `src/document_inteligence/application/rag_pack.py`
+- Ingestion: `src/openxml_parser/infrastructure/ingestors/pptx_ingestor.py`
+- Table XML: `src/openxml_parser/infrastructure/ingestors/pptx_table_xml.py`
+- Containment Graph: `src/openxml_parser/application/containment_graph.py`
+- Table Absorber: `src/openxml_parser/application/table_absorber.py`
+- Reading Order: `src/openxml_parser/application/reading_order.py`
+- Relation Inference: `src/openxml_parser/application/relationships.py`
+- Markdown: `src/openxml_parser/application/markdown_renderer.py`
+- RAG: `src/openxml_parser/application/rag_pack.py`
 

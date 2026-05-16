@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import xml.etree.ElementTree as ET
 
-from document_inteligence.infrastructure.ingestors.pptx_table_xml import NS, _parse_table
+from openxml_parser.infrastructure.ingestors.pptx_table_xml import NS, _parse_table
 
 
 def test_parse_table_handles_gridspan_and_vmerge() -> None:

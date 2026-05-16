@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import xml.etree.ElementTree as ET
 
-from document_inteligence.infrastructure.ingestors.pptx_table_xml import (
+from openxml_parser.infrastructure.ingestors.pptx_table_xml import (
     NS,
     paragraphs_with_formatting,
     _wrap_run,

@@ -2,9 +2,9 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from document_inteligence.application.use_cases import ParseDocumentUseCase
-from document_inteligence.domain.entities import ParsedDocument
-from document_inteligence.domain.repositories import DocumentIngestor
+from openxml_parser.application.use_cases import ParseDocumentUseCase
+from openxml_parser.domain.entities import ParsedDocument
+from openxml_parser.domain.repositories import DocumentIngestor
 
 
 @dataclass

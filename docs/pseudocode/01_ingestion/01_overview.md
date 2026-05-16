@@ -1,6 +1,6 @@
 # Ingestion 개요
 
-> 코드: `src/document_inteligence/infrastructure/ingestors/pptx_ingestor.py`
+> 코드: `src/openxml_parser/infrastructure/ingestors/pptx_ingestor.py`
 
 ## 목적
 

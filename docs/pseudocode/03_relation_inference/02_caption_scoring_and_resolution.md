@@ -1,8 +1,8 @@
 # Relation 점수화 + 충돌 해소
 
 > 코드:
-> - `src/document_inteligence/infrastructure/scorers/rule_based_scorer.py`
-> - `src/document_inteligence/application/relationships.py`
+> - `src/openxml_parser/infrastructure/scorers/rule_based_scorer.py`
+> - `src/openxml_parser/application/relationships.py`
 
 ## 후보 생성 (RuleBasedScorer)
 

@@ -1,6 +1,6 @@
 # 테이블 XML 파싱
 
-> 코드: `src/document_inteligence/infrastructure/ingestors/pptx_table_xml.py`
+> 코드: `src/openxml_parser/infrastructure/ingestors/pptx_table_xml.py`
 
 ## 목적
 

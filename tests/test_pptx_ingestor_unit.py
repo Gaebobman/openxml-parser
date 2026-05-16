@@ -5,7 +5,7 @@ from io import BytesIO
 from lxml import etree
 from PIL import Image
 
-from document_inteligence.infrastructure.ingestors.pptx_ingestor import (
+from openxml_parser.infrastructure.ingestors.pptx_ingestor import (
     _apply_picture_crop_if_needed,
     _build_bbox,
     _clamp_01,

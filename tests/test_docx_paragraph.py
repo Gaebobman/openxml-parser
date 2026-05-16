@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import xml.etree.ElementTree as ET
 
-from document_inteligence.infrastructure.ingestors.docx_paragraph import paragraph_text_and_meta
+from openxml_parser.infrastructure.ingestors.docx_paragraph import paragraph_text_and_meta
 
 W_NS = "http://schemas.openxmlformats.org/wordprocessingml/2006/main"
 
