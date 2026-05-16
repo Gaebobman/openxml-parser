@@ -20,7 +20,7 @@ Open XML 문서(PPTX, DOCX, XLSX, HWPX)를 **구조화 JSON · Markdown · RAG c
 | Format | Status | Notes |
 |--------|--------|--------|
 | `.pptx` | Full | Slide coordinates, master shapes, OMML math (linear) |
-| `.docx` | Beta | Sections, headings/lists, tables, inline images |
+| `.docx` | Beta | Page metrics, flow spacing, floating anchors/text boxes, tables |
 | `.xlsx` | Beta | Sheet table + merged cells; embedded images/charts |
 | `.hwpx` | Beta | Section XML; tables with colspan |
 | `.hwp` (binary) | Not supported | Use HWPX export |

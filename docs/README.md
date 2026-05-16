@@ -22,7 +22,7 @@
 | 포맷 | Ingestor | 레이아웃 |
 |------|----------|----------|
 | PPTX | `pptx_ingestor.py` | 슬라이드 좌표 (EMU → normalized bbox) |
-| DOCX | `docx_ingestor.py` | 구조 흐름 + optional drawing anchor bbox |
+| DOCX | `docx_ingestor.py` + `docx_layout.py` | `w:sectPr` 페이지 크기/여백, 단락 spacing 흐름, `wp:anchor` 플로팅 박스/이미지 |
 | XLSX | `xlsx_ingestor.py` | 시트 = 페이지, 표 + 이미지/차트 앵커 |
 | HWPX | `hwpx_ingestor.py` | section XML, 구조 흐름 |
 

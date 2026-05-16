@@ -7,6 +7,26 @@ from document_inteligence.infrastructure.ingestors.docx_paragraph import paragra
 W_NS = "http://schemas.openxmlformats.org/wordprocessingml/2006/main"
 
 
+def test_run_inside_drawing_not_duplicated_as_paragraph_text() -> None:
+    xml = f"""
+    <w:p xmlns:w="{W_NS}"
+         xmlns:wps="http://schemas.microsoft.com/office/word/2010/wordprocessingShape">
+      <w:r>
+        <w:drawing>
+          <wps:txbx>
+            <w:txbxContent>
+              <w:p><w:r><w:t>Inside box</w:t></w:r></w:p>
+            </w:txbxContent>
+          </wps:txbx>
+        </w:drawing>
+      </w:r>
+    </w:p>
+    """
+    p = ET.fromstring(xml)
+    text, _ = paragraph_text_and_meta(p)
+    assert text == ""
+
+
 def test_heading_and_list_metadata() -> None:
     xml = f"""
     <w:p xmlns:w="{W_NS}">

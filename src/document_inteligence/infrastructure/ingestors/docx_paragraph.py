@@ -40,7 +40,9 @@ def paragraph_text_and_meta(p: ET.Element) -> tuple[str, dict[str, object]]:
     for child in p:
         ln = local_name(child.tag)
         if ln == "r":
-            t = text_content(child, ns=W_NS)
+            if child.find(".//w:drawing", W_NS) is not None or child.find(".//w:pict", W_NS) is not None:
+                continue
+            t = _run_text(child)
             if t:
                 parts.append(t)
         elif ln == "hyperlink":
@@ -54,3 +56,12 @@ def paragraph_text_and_meta(p: ET.Element) -> tuple[str, dict[str, object]]:
         body = f"{indent}- {body}"
 
     return body, meta
+
+
+def _run_text(run: ET.Element) -> str:
+    """Text from run children only (exclude nested drawings/text boxes)."""
+    parts: list[str] = []
+    for node in run:
+        if local_name(node.tag) == "t" and node.text:
+            parts.append(node.text)
+    return "".join(parts).strip()
