@@ -6,13 +6,16 @@ from pathlib import Path
 
 from document_inteligence.application.config import ParserConfig
 from document_inteligence.application.use_cases import ParseDocumentUseCase
-from document_inteligence.infrastructure.ingestors.pptx_ingestor import PptxIngestor
+from document_inteligence.infrastructure.ingestors.registry import build_ingestors
 from document_inteligence.infrastructure.verifiers.noop_caption_verifier import NoopCaptionVerifier
 
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="MVP0.3 document parser")
-    parser.add_argument("input_path", help="Input document path (.pptx)")
+    parser.add_argument(
+        "input_path",
+        help="Input document path (.pptx, .docx, .xlsx, .hwpx)",
+    )
     parser.add_argument(
         "--output-json",
         dest="output_json",
@@ -75,11 +78,11 @@ def main() -> None:
     if args.reading_order:
         config.reading_order_strategy = args.reading_order
     use_case = ParseDocumentUseCase(
-        ingestors=[PptxIngestor(
+        ingestors=build_ingestors(
             asset_output_dir=args.assets_dir,
             include_master_shapes=config.include_master_shapes,
             deduplicate_master_shapes=config.deduplicate_master_shapes,
-        )],
+        ),
         config=config,
         caption_verifier=NoopCaptionVerifier(),
     )
