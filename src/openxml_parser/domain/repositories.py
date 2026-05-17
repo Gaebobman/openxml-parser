@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 
-from .entities import DocumentElement, DocumentPage, ParsedDocument
+from .entities import DocumentBlock, DocumentElement, DocumentPage, ElementRelation, ParsedDocument
 
 
 class DocumentIngestor(ABC):
@@ -69,6 +69,19 @@ class RelationScorer(ABC):
         page: DocumentPage,
     ) -> list[dict]:
         """Return a list of ``{type, score, metadata}`` dicts."""
+        raise NotImplementedError
+
+
+class StructureBuilder(ABC):
+    """Build logical document blocks (L3) from ordered page elements."""
+
+    @abstractmethod
+    def build(
+        self,
+        page: DocumentPage,
+        *,
+        relations: list[ElementRelation],
+    ) -> list[DocumentBlock]:
         raise NotImplementedError
 
 

@@ -15,6 +15,7 @@ from openxml_parser.application.markdown_renderer import render_markdown
 from openxml_parser.application.rag_pack import RagChunk, build_rag_chunks
 from openxml_parser.application.relationships import detect_relations
 from openxml_parser.application.containment_graph import resolve_containment
+from openxml_parser.application.document_structure import build_document_blocks
 from openxml_parser.application.table_absorber import absorb_overlapping_elements
 from openxml_parser.application.image_annotation_absorber import absorb_image_annotations
 from openxml_parser.domain.entities import DocumentElement, ElementType
@@ -81,6 +82,7 @@ class ParseDocumentUseCase:
                 strategy=self._reading_order_strategy,
             )
         parsed.relations = detect_relations(parsed.pages, self._config, caption_verifier=self._caption_verifier)
+        parsed.blocks = build_document_blocks(parsed)
         return parsed
 
     @staticmethod

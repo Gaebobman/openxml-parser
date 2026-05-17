@@ -135,6 +135,26 @@ Do **not** commit proprietary documents. Use:
 
 Never put internal file names or customer content in README, docs, or commit messages.
 
+## Agent integration
+
+For LLM / Agent consumption, prefer structured JSON over flat Markdown alone:
+
+- **`pages[].elements`** — primary layer: text, reading order, and native style metadata (`paragraph_style`, `is_heading`, `is_mostly_bold`, `formatted_text`, `list_level`, passive hints like `line_pattern`)
+- **`blocks`** — optional grouping: native Word Headings / PPTX placeholders only (`section_path` is filled when those exist)
+- **`relations`** — `title_of`, `caption_of` links between elements
+
+Markdown `#` depth is a **visual export** of native Heading styles, not document semantics. Do not treat `##` / `###` in `.md` as ground truth for hierarchy; use element metadata and blocks instead.
+
+Example:
+
+```bash
+uv run openxml-parser samples/openxml_parser_public_sample_resume.docx \
+  --output-json out/resume.json \
+  --output-rag-json out/resume.rag.json
+```
+
+RAG chunks expose `metadata.paragraph_style`, `metadata.is_mostly_bold`, `metadata.block_kind`, and `metadata.block_id`. `metadata.section_path` is present only when the source file defines native outline headings—not inferred from bold or bracket lines.
+
 ## Roadmap
 
 - VLM/CLIP `CaptionVerifier` and relation reranker adapters

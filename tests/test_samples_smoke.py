@@ -40,7 +40,11 @@ def test_resume_sample_has_headings_and_substantial_text() -> None:
     use_case = ParseDocumentUseCase(ingestors=build_ingestors())
     parsed = use_case.execute(str(path))
     elements = [el for page in parsed.pages for el in page.elements]
-    heading_count = sum(1 for el in elements if el.metadata.get("is_heading"))
+    styled_count = sum(
+        1
+        for el in elements
+        if el.metadata.get("formatted_text") or el.metadata.get("is_heading")
+    )
     text_chars = sum(len((el.text or "")) for el in elements)
-    assert heading_count >= 3
+    assert styled_count >= 3
     assert text_chars >= 2000

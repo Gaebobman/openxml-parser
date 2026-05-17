@@ -15,6 +15,18 @@ class ElementType(str, Enum):
     UNKNOWN = "unknown"
 
 
+class BlockKind(str, Enum):
+    """Format-agnostic structural kinds (L3). Meaning lives in title_text / section_path."""
+
+    CONTAINER = "container"
+    HEADING = "heading"
+    PARAGRAPH = "paragraph"
+    LIST_ITEM = "list_item"
+    TABLE = "table"
+    FIGURE = "figure"
+    GROUP = "group"
+
+
 @dataclass
 class DocumentElement:
     element_id: str
@@ -23,6 +35,22 @@ class DocumentElement:
     z_order: int
     bbox: BBox
     text: str | None = None
+    metadata: dict[str, object] = field(default_factory=dict)
+
+
+@dataclass
+class DocumentBlock:
+    """Logical block in reading order; elements attach via element_ids."""
+
+    block_id: str
+    kind: BlockKind
+    page_number: int
+    level: int
+    title_text: str
+    element_ids: list[str] = field(default_factory=list)
+    parent_block_id: str | None = None
+    section_path: list[str] = field(default_factory=list)
+    bbox: BBox | None = None
     metadata: dict[str, object] = field(default_factory=dict)
 
 
@@ -49,4 +77,4 @@ class ParsedDocument:
     source_path: str
     pages: list[DocumentPage] = field(default_factory=list)
     relations: list[ElementRelation] = field(default_factory=list)
-
+    blocks: list[DocumentBlock] = field(default_factory=list)

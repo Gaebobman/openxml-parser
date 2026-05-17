@@ -3,7 +3,15 @@ from __future__ import annotations
 import re
 
 from openxml_parser.application.config import ParserConfig
-from openxml_parser.domain.entities import DocumentElement, DocumentPage, ElementRelation, ElementType, ParsedDocument
+from openxml_parser.domain.entities import (
+    DocumentBlock,
+    DocumentElement,
+    DocumentPage,
+    ElementRelation,
+    ElementType,
+    ParsedDocument,
+    BlockKind,
+)
 
 
 def render_markdown(
@@ -13,11 +21,85 @@ def render_markdown(
     config: ParserConfig | None = None,
 ) -> str:
     cfg = config or ParserConfig()
+    if parsed_document.blocks and _blocks_use_native_headings(parsed_document):
+        return _render_markdown_from_blocks(
+            parsed_document,
+            include_slide_comment=include_slide_comment,
+            config=cfg,
+        )
     rel_by_target = _caption_relation_map(parsed_document.relations)
     chunks: list[str] = []
     for page in parsed_document.pages:
         chunks.append(_render_page(page, include_slide_comment=include_slide_comment, rel_by_target=rel_by_target, config=cfg))
     return "\n\n---\n\n".join([c for c in chunks if c.strip()]).strip() + "\n"
+
+
+def _render_markdown_from_blocks(
+    parsed_document: ParsedDocument,
+    *,
+    include_slide_comment: bool,
+    config: ParserConfig,
+) -> str:
+    rel_by_target = _caption_relation_map(parsed_document.relations)
+    element_by_id: dict[str, DocumentElement] = {}
+    for page in parsed_document.pages:
+        for element in page.elements:
+            element_by_id[element.element_id] = element
+
+    chunks: list[str] = []
+    current_page: int | None = None
+    seen_captions: set[str] = set()
+    first_heading = True
+
+    for block in parsed_document.blocks:
+        if include_slide_comment and block.page_number != current_page:
+            if chunks:
+                chunks.append("")
+            chunks.append(f"<!-- Page {block.page_number} -->")
+            chunks.append("")
+            current_page = block.page_number
+            first_heading = True
+
+        if block.kind == BlockKind.HEADING and block.level > 0 and block.title_text:
+            title = block.title_text.replace("\t", " · ")
+            if first_heading and block.level >= 2:
+                chunks.append(f"# {title}")
+                first_heading = False
+            else:
+                chunks.append(f"{'#' * block.level} {title}")
+            chunks.append("")
+
+        if block.kind == BlockKind.CONTAINER and block.title_text:
+            chunks.append(f"<!-- {block.title_text} -->")
+            chunks.append("")
+
+        for element_id in block.element_ids:
+            element = element_by_id.get(element_id)
+            if element is None:
+                continue
+            if bool(element.metadata.get("absorbed_by_table")) or bool(element.metadata.get("absorbed_by")):
+                continue
+            if _is_block_title_element(block, element):
+                continue
+            body = _render_element(element, title_used=True, config=config)
+            if not body:
+                continue
+            chunks.append(body)
+            caption = rel_by_target.get(element.element_id)
+            if caption and caption not in seen_captions:
+                chunks.append(f"> {caption}")
+                seen_captions.add(caption)
+            chunks.append("")
+
+    return "\n".join(chunks).strip() + "\n"
+
+
+def _is_block_title_element(block: DocumentBlock, element: DocumentElement) -> bool:
+    if block.kind != BlockKind.HEADING:
+        return False
+    el_text = (element.text or "").strip().replace("\t", " · ")
+    title = block.title_text.strip().replace("\t", " · ")
+    return el_text == title
 
 
 def _render_page(
@@ -72,8 +154,8 @@ def _render_element(element: DocumentElement, *, title_used: bool, config: Parse
             fmt = element.metadata.get("formatted_text")
             if isinstance(fmt, str) and fmt.strip():
                 display = fmt.strip()
-        if not title_used and _looks_like_title(element, config):
-            return f"# {text}"
+        if bool(element.metadata.get("is_placeholder")) and not title_used:
+            return f"# {display}"
         if bool(element.metadata.get("is_heading")):
             level = int(element.metadata.get("heading_level", 2) or 2)
             level = max(2, min(level, 6))
@@ -109,15 +191,26 @@ def _render_element(element: DocumentElement, *, title_used: bool, config: Parse
     return _preserve_linebreaks((element.text or "").strip())
 
 
-def _looks_like_title(element: DocumentElement, config: ParserConfig) -> bool:
-    if bool(element.metadata.get("is_placeholder")):
-        return True
-    if bool(element.metadata.get("is_heading")):
-        return True
-    text = (element.text or "").strip()
-    if not text:
-        return False
-    return len(text) <= config.title_max_len and "\n" not in text
+def _blocks_use_native_headings(parsed_document: ParsedDocument) -> bool:
+    element_by_id = {
+        e.element_id: e
+        for page in parsed_document.pages
+        for e in page.elements
+    }
+    for block in parsed_document.blocks:
+        if block.kind != BlockKind.HEADING:
+            continue
+        for element_id in block.element_ids:
+            element = element_by_id.get(element_id)
+            if element is not None and bool(element.metadata.get("is_heading")):
+                return True
+        if block.level > 0 and any(
+            element_by_id.get(eid) is not None
+            and bool(element_by_id[eid].metadata.get("is_placeholder"))
+            for eid in block.element_ids
+        ):
+            return True
+    return False
 
 
 def _render_table(element: DocumentElement, *, config: ParserConfig, use_formatting: bool = False) -> str:
@@ -234,7 +327,6 @@ def _header_score(cells: list[dict[str, object]], *, row_index: int) -> float:
             short_like += 1
     text_signal += short_like / max(len(cells), 1)
 
-    # style metadata may not exist; when absent this remains 0.
     return (0.5 * structure_signal) + (0.3 * style_signal) + (0.2 * text_signal)
 
 
@@ -295,7 +387,6 @@ def _cell_content_text(cell: dict[str, object], *, use_formatting: bool = False)
 
 
 def _col_width_percentages(raw_widths: list[object]) -> list[float] | None:
-    """Convert raw EMU column widths to percentage values."""
     nums = []
     for v in raw_widths:
         try:
@@ -309,7 +400,6 @@ def _col_width_percentages(raw_widths: list[object]) -> list[float] | None:
 
 
 def _cell_vertical_midpoint(cell_bbox: dict[str, float] | None) -> float | None:
-    """Return the vertical midpoint (normalised) of a cell bbox."""
     if not isinstance(cell_bbox, dict):
         return None
     y = cell_bbox.get("y")
@@ -320,14 +410,12 @@ def _cell_vertical_midpoint(cell_bbox: dict[str, float] | None) -> float | None:
 
 
 def _nl_to_br(text: str) -> str:
-    """Convert newlines to HTML <br/> for use inside table cells."""
     if "\n" not in text:
         return text
     return "<br/>".join(line.rstrip() for line in text.split("\n"))
 
 
 def _preserve_linebreaks(text: str) -> str:
-    """Convert \\n to Markdown line breaks (trailing two spaces)."""
     if "\n" not in text:
         return text
     return "  \n".join(line.rstrip() for line in text.split("\n"))
@@ -349,19 +437,12 @@ _MD_IMG_RE = re.compile(r"!\[([^\]]*)\]\(([^)]+)\)")
 
 
 def _md_image_to_html(text: str, *, width: int = 0) -> str:
-    """Convert Markdown image syntax to <img> tag for use inside HTML blocks."""
     if width > 0:
         return _MD_IMG_RE.sub(rf'<img src="\2" alt="\1" width="{width}"/>', text)
     return _MD_IMG_RE.sub(r'<img src="\2" alt="\1"/>', text)
 
 
 def _group_separator(prev_group: str, cur_group: str) -> str | None:
-    """Return a visual separator when spatial groups change.
-
-    Only emits a separator when the transition involves a vertical
-    cut boundary (column change) rather than a horizontal cut
-    (row change within the same region).
-    """
     prev_parts = prev_group.split(".")
     cur_parts = cur_group.split(".")
     shared_depth = 0
@@ -388,4 +469,3 @@ def _caption_relation_map(relations: list[ElementRelation]) -> dict[str, str]:
         if isinstance(caption_text, str) and caption_text.strip():
             out[rel.target_element_id] = caption_text.strip()
     return out
-

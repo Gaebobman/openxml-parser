@@ -30,7 +30,21 @@ def build_debug_report(parsed_document: ParsedDocument) -> dict[str, object]:
     return {
         "source_path": parsed_document.source_path,
         "num_pages": len(parsed_document.pages),
+        "num_blocks": len(parsed_document.blocks),
         "num_relations": len(parsed_document.relations),
+        "blocks": [
+            {
+                "block_id": b.block_id,
+                "kind": b.kind.value,
+                "level": b.level,
+                "title_text": b.title_text[:120],
+                "parent_block_id": b.parent_block_id,
+                "section_path": b.section_path,
+                "element_ids": b.element_ids,
+                "page_number": b.page_number,
+            }
+            for b in parsed_document.blocks
+        ],
         "relations": [
             {
                 "relation_type": r.relation_type,

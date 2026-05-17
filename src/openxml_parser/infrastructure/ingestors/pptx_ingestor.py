@@ -292,6 +292,7 @@ class PptxIngestor(DocumentIngestor):
                     width=slide_width,
                     height=slide_height,
                     elements=elements,
+                    metadata={"source_format": "pptx"},
                 )
             )
 

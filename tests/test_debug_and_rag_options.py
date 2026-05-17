@@ -64,5 +64,5 @@ def test_rag_chunk_can_include_caption_lines() -> None:
     doc = ParsedDocument(source_path="x.pptx", pages=[page], relations=[relation])
 
     chunks = build_rag_chunks(doc, ParserConfig(chunk_include_captions=True, chunk_max_chars=500))
-    assert "[CAPTION] 그림 설명" in chunks[0].text
+    assert any("[CAPTION] 그림 설명" in c.text for c in chunks)
 

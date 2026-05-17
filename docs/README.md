@@ -79,3 +79,10 @@
 ### 기타
 - 공개 데모: `samples/`. 로컬 전용 자료: `private_example/`, `private_testdata/` (gitignore).
 
+### Agent 문서 구조 (L3)
+
+- `ParsedDocument.pages[].elements`: L1 파싱 결과 (스타일·런 메타 포함). Agent는 이 레이어를 우선 사용
+- `ParsedDocument.blocks`: Word `Heading` / PPTX placeholder 등 **파일에 선언된** outline만 반영 (`kind`, `section_path`, `element_ids`)
+- `OutlineStructureBuilder`: `infrastructure/structure/outline_structure.py` — `outline_inferred` 등 휴리스틱 없음
+- Markdown: 네이티브 Heading → `#`; 그 외는 `formatted_text`(**bold**) 등 시각 표현만
+
