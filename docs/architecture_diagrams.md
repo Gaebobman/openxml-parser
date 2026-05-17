@@ -29,6 +29,7 @@ flowchart TB
         Absorber[table_absorber.py]
         Order[reading_order.py]
         Relation[relationships.py]
+        DocStruct[document_structure.py]
         Render[markdown_renderer.py]
         Rag[rag_pack.py]
         Debug[debug_report.py]
@@ -39,7 +40,8 @@ flowchart TB
         Values[value_objects.py]
     end
     subgraph infraLayer [Infrastructure]
-        Ingestor[pptx_ingestor.py]
+        Ingestor[ingestors/*]
+        Structure[outline_structure.py]
         TableXml[pptx_table_xml.py]
         Verifier[verifiers/*]
     end
@@ -49,6 +51,8 @@ flowchart TB
     UseCase --> Absorber
     UseCase --> Order
     UseCase --> Relation
+    UseCase --> DocStruct
+    DocStruct --> Structure
     UseCase --> Render
     UseCase --> Rag
     UseCase --> Debug
@@ -95,4 +99,28 @@ flowchart LR
     Ordered --> HtmlTable
     HtmlTable --> MarkdownOut
 ```
+
+## 5) Parse Pipeline (multi-format)
+
+```mermaid
+flowchart LR
+    Ingest[Ingestor] --> Contain[Containment]
+    Contain --> Absorb[Table/Image absorb]
+    Absorb --> Order[Reading order]
+    Order --> Rel[Relations]
+    Rel --> Struct[StructureBuilder]
+    Struct --> JSON[JSON blocks+elements]
+    Order --> MD[Markdown]
+    Struct --> MD
+    Struct --> RAG[RAG chunks]
+```
+
+## 6) Parsing vs style vs semantics
+
+| Responsibility | Owner | Example |
+|----------------|--------|---------|
+| Visible text + native styles | Parser L1 | `paragraph_style`, `formatted_text` |
+| Layout / order | Parser L2 | bbox, `z_order`, `spatial_group` |
+| Optional outline tree | Parser L3 | `blocks` when Word Heading exists |
+| Section meaning | Agent / LLM | “성과 under project X” from JSON, not `#` depth in MD |
 

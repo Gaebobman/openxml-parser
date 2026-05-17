@@ -28,7 +28,22 @@
 
 - 등록: `infrastructure/ingestors/registry.py` → `build_ingestors()`
 - 공개 샘플: `samples/openxml_parser_public_sample.{pptx,docx,xlsx,hwpx}` 및 `openxml_parser_public_sample_resume.docx`
-- 이후 파이프라인(containment, reading order, relations, render)은 포맷 공통
+- 이후 파이프라인(containment, reading order, relations, **structure build**, render)은 포맷 공통
+
+### DOCX 단락 메타 (L1)
+
+`infrastructure/ingestors/docx_paragraph.py`가 단락 XML에서 추출:
+
+| 메타 키 | 의미 |
+|---------|------|
+| `paragraph_style` | `w:pStyle` 값 (예: `Heading2`) |
+| `is_heading` / `heading_level` | Word Heading 스타일일 때만 |
+| `is_mostly_bold` | run bold 비율 |
+| `formatted_text` | run 단위 Markdown (`**bold**`) — MD/RAG 시각 출력용 |
+| `is_list_item` / `list_level` | numbering |
+| `line_pattern` | passive 힌트 (`bracket_leading` 등). **구조 트리에 사용하지 않음** |
+
+의미 추론(프로젝트/성과 소속, 섹션 계층)은 파서가 하지 않습니다. Agent/LLM이 `elements` + 메타로 판단합니다.
 
 ### 추출/렌더링
 - 테이블 렌더링은 기본적으로 HTML `<table>`을 사용하며 병합 셀 span(`colspan`, `rowspan`)을 보존합니다. `<colgroup>`으로 PPTX 원본의 컬럼 너비 비율도 보존합니다.
@@ -79,10 +94,36 @@
 ### 기타
 - 공개 데모: `samples/`. 로컬 전용 자료: `private_example/`, `private_testdata/` (gitignore).
 
-### Agent 문서 구조 (L3)
+### Agent 문서 구조 (L1–L3)
 
-- `ParsedDocument.pages[].elements`: L1 파싱 결과 (스타일·런 메타 포함). Agent는 이 레이어를 우선 사용
-- `ParsedDocument.blocks`: Word `Heading` / PPTX placeholder 등 **파일에 선언된** outline만 반영 (`kind`, `section_path`, `element_ids`)
-- `OutlineStructureBuilder`: `infrastructure/structure/outline_structure.py` — `outline_inferred` 등 휴리스틱 없음
-- Markdown: 네이티브 Heading → `#`; 그 외는 `formatted_text`(**bold**) 등 시각 표현만
+```mermaid
+flowchart TB
+  subgraph L1 [L1 parse]
+    El[pages.elements]
+    Meta[paragraph_style is_heading formatted_text ...]
+  end
+  subgraph L2 [L2 layout]
+    Order[reading order]
+    Rel[relations]
+  end
+  subgraph L3 [L3 optional]
+    Bl[blocks BlockKind]
+    Path[section_path if native headings]
+  end
+  El --> Order
+  Order --> Rel
+  Rel --> Bl
+  Meta --> El
+```
+
+- **L1** `ParsedDocument.pages[].elements` — Agent **우선** 레이어
+- **L2** `relations`, bbox, absorption 메타
+- **L3** `ParsedDocument.blocks` — `OutlineStructureBuilder` (`infrastructure/structure/`)
+  - `BlockKind`: `heading`, `paragraph`, `list_item`, `table`, `figure`, `container`, …
+  - `HEADING` block: Word `Heading` 스타일 또는 PPTX `is_placeholder`만
+  - `section_path`: 네이티브 heading 체인이 있을 때만 채움
+- **Markdown**: 네이티브 Heading → `#`; 그 외 `formatted_text`(**bold**). Heading 없는 DOCX(이력서 샘플)는 element 순회 렌더 → 대부분 평문
+- **RAG**: element 단위 청크(기본) 또는 native heading 아래 묶음. `metadata.section_path`는 native outline 있을 때만
+
+상세: [`pseudocode/04_rendering/`](pseudocode/04_rendering/), [`architecture_diagrams.md`](architecture_diagrams.md)
 

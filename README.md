@@ -76,14 +76,18 @@ Optional config JSON — see [ParserConfig](src/openxml_parser/application/confi
 ```mermaid
 flowchart LR
   Input[OpenXML file] --> Ingest[Format ingestor]
-  Ingest --> Elements[DocumentElement pages]
-  Elements --> Order[Reading order]
-  Order --> Rel[Relation detection]
-  Rel --> Out[JSON / MD / RAG / Debug]
+  Ingest --> Elements[L1 elements]
+  Elements --> Layout[L2 layout pipeline]
+  Layout --> Blocks[L3 blocks optional]
+  Blocks --> Out[JSON / MD / RAG / Debug]
+  Elements --> Out
 ```
 
-- **Domain ports**: `DocumentIngestor`, `ReadingOrderStrategy`, `RelationScorer`, `CaptionVerifier`
-- **Post-ingestion pipeline** (shared): containment graph → table/image absorption → noise filter → reading order → relations → render
+- **L1 `pages[].elements`** — visible text, document order, native style metadata (no semantic guessing)
+- **L2 layout** — reading order, bbox, containment, absorption, relations
+- **L3 `blocks`** — optional grouping from **file-declared** outline only (Word `Heading`, PPTX placeholder)
+- **Domain ports**: `DocumentIngestor`, `ReadingOrderStrategy`, `RelationScorer`, `CaptionVerifier`, `StructureBuilder`
+- **Post-ingestion pipeline** (shared): containment → absorption → noise filter → reading order → relations → structure build → render
 
 Details: [`docs/README.md`](docs/README.md), [`docs/architecture_diagrams.md`](docs/architecture_diagrams.md)
 
@@ -95,6 +99,7 @@ src/openxml_parser/
   application/      use_cases, config, reading_order, relationships, renderers
   infrastructure/
     ingestors/      pptx, docx, xlsx, hwpx, registry
+    structure/      OutlineStructureBuilder (native outline only)
     strategies/     reading order implementations
     scorers/        rule_based_scorer
   interfaces/       cli.py
@@ -137,26 +142,32 @@ Never put internal file names or customer content in README, docs, or commit mes
 
 ## Agent integration
 
-For LLM / Agent consumption, prefer structured JSON over flat Markdown alone:
+For LLM / Agent consumption, prefer **structured JSON** over flat Markdown.
 
-- **`pages[].elements`** — primary layer: text, reading order, and native style metadata (`paragraph_style`, `is_heading`, `is_mostly_bold`, `formatted_text`, `list_level`, passive hints like `line_pattern`)
-- **`blocks`** — optional grouping: native Word Headings / PPTX placeholders only (`section_path` is filled when those exist)
-- **`relations`** — `title_of`, `caption_of` links between elements
+| Layer | Field | Use for |
+|-------|--------|---------|
+| L1 | `pages[].elements[]` | Primary: text, `z_order`, bbox, style metadata |
+| L2 | `relations[]` | `title_of`, `caption_of` links |
+| L3 | `blocks[]` | Optional tree when the file declares headings (Word `Heading`, PPTX placeholder) |
 
-Markdown `#` depth is a **visual export** of native Heading styles, not document semantics. Do not treat `##` / `###` in `.md` as ground truth for hierarchy; use element metadata and blocks instead.
+**Element metadata (DOCX example):** `paragraph_style`, `is_heading`, `heading_level`, `is_mostly_bold`, `formatted_text`, `is_list_item`, `list_level`, passive `line_pattern` (e.g. `bracket_leading`) — recorded for the model, not turned into a forced outline.
+
+**Markdown export:** `#` lines map to **native Heading styles only**. Other emphasis uses `formatted_text` (e.g. `**bold**`). Resume-style docs without Word Heading styles render mostly flat; hierarchy is for the Agent to infer from JSON, not from `#` depth in `.md`.
 
 Example:
 
 ```bash
 uv run openxml-parser samples/openxml_parser_public_sample_resume.docx \
   --output-json out/resume.json \
-  --output-rag-json out/resume.rag.json
+  --output-rag-json out/resume.rag.json \
+  --output-md out/resume.md
 ```
 
-RAG chunks expose `metadata.paragraph_style`, `metadata.is_mostly_bold`, `metadata.block_kind`, and `metadata.block_id`. `metadata.section_path` is present only when the source file defines native outline headings—not inferred from bold or bracket lines.
+**RAG chunks:** one chunk per element (or per native-heading block when outline exists). Metadata includes `paragraph_style`, `is_mostly_bold`, `block_kind`, `element_ids`. `section_path` is omitted unless the source file defines native outline headings.
 
 ## Roadmap
 
+- DOCX `outlineLvl` / styles.xml beyond built-in `Heading` styles
 - VLM/CLIP `CaptionVerifier` and relation reranker adapters
 - DOCX numbering.xml integration and floating text boxes
 - XLSX cell-level elements (optional) and formula preservation

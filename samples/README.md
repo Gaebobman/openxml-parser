@@ -7,7 +7,7 @@ Safe-to-share fixtures for demos, CI smoke tests, and documentation.
 | `openxml_parser_public_sample.pptx` | PPTX | Multi-slide layout demo (tables, images, relations) |
 | `openxml_parser_public_sample.docx` | DOCX | Heading, list, table |
 | `openxml_parser_public_sample_layout.docx` | DOCX | Page margins, spacing, floating text box |
-| `openxml_parser_public_sample_resume.docx` | DOCX | Real resume layout (sections, lists, tables) — shared with consent |
+| `openxml_parser_public_sample_resume.docx` | DOCX | Resume layout (bold labels, lists, tables; no Word Heading styles — MD is mostly flat, JSON has style metadata) |
 | `openxml_parser_public_sample.xlsx` | XLSX | Merged cells, metrics table |
 | `openxml_parser_public_sample.hwpx` | HWPX | Paragraph + table with colspan |
 

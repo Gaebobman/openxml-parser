@@ -60,6 +60,9 @@ uv run openxml-parser ./sample.pptx --reading-order composite --output-md ./out/
 
 ## 7. 운영 체크포인트
 
+- Agent 연동 시 `pages[].elements[].metadata` (스타일 메타) 우선 사용; Markdown `#` depth는 native Heading만 반영됨
+- Heading 없는 DOCX(이력서 샘플): MD는 flat + `**bold**`, JSON/RAG에 `is_mostly_bold` / `formatted_text` 확인
+- `debug.json`의 `blocks` / `section_path`는 native outline 있을 때만 의미 있음
 - Markdown 이미지 경로가 상대경로인지 확인
 - GROUP 내부 이미지가 누락되지 않았는지 확인 (그룹 shape 포함 슬라이드)
 - 크롭된 이미지가 원본 전체로 보이지 않는지 확인 (PPTX crop 반영 여부)
@@ -88,4 +91,5 @@ uv run openxml-parser ./sample.pptx --reading-order composite --output-md ./out/
 10. 글머리 기호/번호 보존 확인
 11. `out/eval/caption_baseline.json` 재생성 후 지표 변화 확인
 12. 로컬 golden이 있으면 `evaluate_golden.py` / `test_golden_regression.py` 실행
+13. `samples/openxml_parser_public_sample_resume.docx` → JSON에 `outline_inferred` 없음, MD에 `# 성과` 같은 추론 heading 없음 확인
 

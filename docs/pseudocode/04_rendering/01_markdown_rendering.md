@@ -8,8 +8,17 @@
 
 ## 규칙 요약
 
+### 렌더 경로 선택
+
+- `ParsedDocument.blocks`에 **native heading**이 있으면 → block 순회 렌더
+- 그 외(이력서 등 Heading 없는 DOCX) → **element 순회** 렌더 (기본)
+
+### 제목 / 강조
+
+- `#` / `##` … : `element.metadata.is_heading` (Word Heading 스타일) 또는 PPTX `is_placeholder`만
+- **휴리스틱 제목 추론 없음** (bold, 괄호 줄, 짧은 라벨 → `#` 승격 안 함)
+- DOCX bold: ingest `formatted_text` → `**...**` (`preserve_text_formatting`)
 - 페이지 시작: `<!-- Page N -->`
-- 첫 제목 후보 텍스트: `# ...`
 - 이미지: `<img src="..." alt="..." width="N"/>` HTML 태그 출력. `width`는 PPTX shape의 EMU 치수를 96 DPI 기준 픽셀로 변환한 값.
 - 이미지 주석: annotation이 있으면 이미지 아래에 `*레이블1 | 레이블2*` 이탤릭으로 출력
 - 테이블: 기본 HTML `<table>` 렌더링 (병합 셀 `colspan`/`rowspan` 지원, `<colgroup>`으로 원본 컬럼 너비 비율 보존)
